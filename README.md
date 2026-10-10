@@ -107,7 +107,7 @@ No diodes are needed. Each pedal has its own pin, so there's no keyboard-matrix 
 ## Firmware
 
 1. Install [CircuitPython](https://circuitpython.org/board/raspberry_pi_pico/) on the Pico ([Pico 2 page](https://circuitpython.org/board/raspberry_pi_pico2/)).
-2. Copy **everything inside the [`firmware/`](firmware) folder** onto the `CIRCUITPY` drive: `boot.py`, `code.py`, and the `lib` folder. If the drive asks, replace the existing files.
+2. Download **`firmware.zip`** from [Releases](../../releases), unzip it, and copy everything inside (`boot.py`, `code.py`, and the `lib` folder) onto the `CIRCUITPY` drive. If the drive asks, replace the existing files. (The same files are in the [`firmware/`](firmware) folder of this repo.)
 3. **Unplug and replug** the Pico.
 
 When you're done, the drive should look like this:
