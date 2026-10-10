@@ -107,9 +107,20 @@ No diodes are needed. Each pedal has its own pin, so there's no keyboard-matrix 
 ## Firmware
 
 1. Install [CircuitPython](https://circuitpython.org/board/raspberry_pi_pico/) on the Pico ([Pico 2 page](https://circuitpython.org/board/raspberry_pi_pico2/)).
-2. Copy the `adafruit_hid` folder from the [CircuitPython library bundle](https://circuitpython.org/libraries) into `CIRCUITPY/lib`.
-3. Copy [`firmware/boot.py`](firmware/boot.py) and [`firmware/code.py`](firmware/code.py) onto the `CIRCUITPY` drive.
-4. **Unplug and replug** the Pico.
+2. Copy **everything inside the [`firmware/`](firmware) folder** onto the `CIRCUITPY` drive: `boot.py`, `code.py`, and the `lib` folder. If the drive asks, replace the existing files.
+3. **Unplug and replug** the Pico.
+
+When you're done, the drive should look like this:
+
+```
+CIRCUITPY/
+├── boot.py
+├── code.py
+└── lib/
+    └── adafruit_hid/
+```
+
+The only extra library needed, `adafruit_hid`, is included in `firmware/lib`. Everything else the code uses is built into CircuitPython. (If you prefer to get it yourself, it's in the official [CircuitPython library bundle](https://circuitpython.org/libraries).)
 
 Default keys: **Left = F13, Middle = F14, Right = F15.** F13–F24 don't exist on normal keyboards, so they never clash with typing. Map them in Stream Deck, AutoHotkey, OBS, or any app that accepts hotkeys.
 
@@ -191,3 +202,5 @@ This project uses two licenses:
 | **Firmware and app** (`firmware/`, `app/`) | [MIT](LICENSE-CODE) | Use, modify, and share freely. Keep the copyright notice |
 
 Want to sell prints? [Open an issue](../../issues) and ask.
+
+**Included third-party library:** [`adafruit_hid`](https://github.com/adafruit/Adafruit_CircuitPython_HID) by Adafruit Industries, MIT License (see `firmware/lib/adafruit_hid/LICENSE`).
