@@ -11,6 +11,8 @@ https://makerworld.com/en/models/2042179-usb-foot-switch#profileId-2203328
 
 This is **not really a remix**: a few ideas came from the original pedal, but it's a complete redesign.
 
+**Design origin:** I printed the original, then modeled this design from scratch at a size I preferred. No original files were imported, traced, or modified (Oct 2026).
+
 > ⚠️ **Parts are not interchangeable with the original USB Foot Switch.** The base and top/cover have different dimensions from the original design, so they won't swap between the two.
 
 More details to come.
