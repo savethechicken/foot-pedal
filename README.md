@@ -82,6 +82,13 @@ Each switch has two legs. One leg goes to its own Pico pin; the other goes to gr
 
 *The pins used are circled. Note that the **GP** number (what the code uses) and the **physical pin number** (counted around the board) are different. Pinout diagram adapted from [Raspberry Pi Ltd](https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html), CC BY-SA 4.0.*
 
+> **Using different pins?** Any of the Pico's **GP** pins will work, but the firmware is set up for GP18, GP17 and GP16. If you wire to other pins, update the code to match, or those pedals won't respond:
+>
+> - **`code.py`:** the `PEDAL_PINS` line in the BUILD SETTINGS block, listed **left to right**. For example: `PEDAL_PINS = (board.GP2, board.GP3, board.GP4)`
+> - **`boot.py`:** `SHOW_DRIVE_PIN`, the pedal you hold at plug-in to show the `CIRCUITPY` drive. It must be one of the pins in `PEDAL_PINS`.
+>
+> Ground can go to any **GND** pin.
+
 **Ground:** Run one wire from a Pico **GND** pin to the switches. I daisy-chained it through two Wago connectors: the Pico's GND goes to Wago 1 in the left pedal, which feeds the left switch and continues to Wago 2 in the middle pedal, which feeds the middle and right switches. Where two thin wires share one Wago port, twist them together first. You can also solder the grounds together or use more than one of the Pico's GND pins.
 
 No diodes are needed. Each pedal has its own pin, so there's no keyboard-matrix ghosting.
