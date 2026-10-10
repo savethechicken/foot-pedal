@@ -1,0 +1,44 @@
+# Builds "Pedal Config.exe" on a Windows machine at GitHub.
+#
+# - Publish a release (Releases -> Draft a new release) and the .exe is
+#   attached to it automatically.
+# - Or run it by hand: Actions tab -> "Build Pedal Config.exe" -> Run workflow.
+#   The .exe then appears as a downloadable artifact on that run.
+
+name: Build Pedal Config.exe
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # needed to attach the .exe to a release
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install build tools
+        run: python -m pip install pyserial pyinstaller
+
+      - name: Build the .exe
+        run: python -m PyInstaller --onefile --windowed --name "Pedal Config" app/pedal_config.py
+
+      - name: Save the .exe on this run
+        uses: actions/upload-artifact@v4
+        with:
+          name: Pedal-Config-exe
+          path: dist/Pedal Config.exe
+
+      - name: Attach the .exe to the release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/Pedal Config.exe

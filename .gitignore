@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# PyInstaller output (the .exe goes on the Releases page, not in the repo)
+build/
+dist/
+*.spec
+
+# OS clutter
+.DS_Store
+Thumbs.db
+desktop.ini
