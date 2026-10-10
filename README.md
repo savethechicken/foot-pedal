@@ -183,4 +183,11 @@ The `.exe` is also built automatically by GitHub Actions whenever a new release 
 
 ## License
 
-TBD. A license will be added soon. Until then, please ask before reusing or redistributing these files.
+This project uses two licenses:
+
+| What | License | In short |
+|---|---|---|
+| **3D models, photos, docs** (`3d-print/`, `images/`, `docs/`, this README) | [CC BY-NC-SA 4.0](LICENSE-MODELS) | Download, print, and remix freely with credit. **No selling** the files or prints. Remixes must use the same license |
+| **Firmware and app** (`firmware/`, `app/`) | [MIT](LICENSE-CODE) | Use, modify, and share freely. Keep the copyright notice |
+
+Want to sell prints? [Open an issue](../../issues) and ask.

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT  (c) 2026 savethechicken - see LICENSE-CODE
 # boot.py - runs ONCE at power-up, before code.py
 #
 # Jobs:

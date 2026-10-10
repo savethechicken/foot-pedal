@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT  (c) 2026 savethechicken - see LICENSE-CODE
 # code.py - Foot pedal firmware with app-configurable keys
 #
 # What's new compared to the earlier code.py:

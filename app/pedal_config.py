@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT  (c) 2026 savethechicken - see LICENSE-CODE
 """
 Pedal Config - a desktop app for changing which keys the foot pedal sends.
 
