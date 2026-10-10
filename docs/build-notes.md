@@ -25,7 +25,7 @@ More details to come.
 |---|---|---|---|
 | M3 heat-set inserts | 2 | 6 | Recommended. Screws alone also work (see Assembly) |
 | M3 × 4 screws | 2 | 6 | Used on all pedals. M3 × 5 or M3 × 6 also work, but they're tighter and harder to tighten down (see Assembly) |
-| Cherry MX mechanical key switch | 1 | 3 | |
+| Cherry MX mechanical key switch | 1 | 3 | I used **Cherry MX Blue** because they are "clicky": you get a good audible click when the pedal is pressed |
 | Compression spring | 2 | 6 | **3/8" × 3/4" (about 9.5 mm × 19.1 mm)** from the Harbor Freight 200-piece assorted set. See the Spring section for alternatives |
 | Raspberry Pi Pico 1 or 2 | 1 | 1 | |
 | M2 self-tapping screws (Pico mount) | Up to 4 | Up to 4 | Pico holes are 2.1 mm; the base's screw holes are modeled at **1.8 mm** so the screws cut threads into the plastic |

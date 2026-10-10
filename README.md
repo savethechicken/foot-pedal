@@ -30,7 +30,7 @@ Inspired by the [USB Foot Switch](https://makerworld.com/en/models/2042179-usb-f
 | Item | Single | Three | Notes |
 |---|---|---|---|
 | Raspberry Pi Pico 1 or 2 | 1 | 1 | |
-| Cherry MX–style mechanical key switch | 1 | 3 | |
+| Cherry MX–style mechanical key switch | 1 | 3 | I used **Cherry MX Blue**: "clicky" switches that give a satisfying audible click with each press, so you know the pedal registered. Any MX-style switch fits. Pick a quieter type (Red, Brown) if the click would bother you or others nearby, like on a stream or call |
 | Compression spring, 3/8" × 3/4" (≈9.5 × 19.1 mm) | 2 | 6 | From the [Harbor Freight 200-piece assorted spring set](https://www.harborfreight.com/200-piece-assorted-spring-set-67562.html), which includes 10 of this size. 7/32" × 11/16" and 3/8" × 5/8" from the same set also work |
 | M3 heat-set inserts | 2 | 6 | Recommended. Screws alone also work (see Assembly) |
 | M3 × 4 screws | 2 | 6 | M3 × 5 or M3 × 6 also work but are harder to tighten in the tight gap |
