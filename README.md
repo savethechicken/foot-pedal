@@ -71,11 +71,16 @@ The Pico sits in the **far-left pedal** (as the unit sits on the floor in front 
 
 Each switch has two legs. One leg goes to its own Pico pin; the other goes to ground.
 
-| Pedal | Pico pin |
-|---|---|
-| Left | GP18 |
-| Middle | GP17 |
-| Right | GP16 |
+| Pedal | Pico pin | Physical pin # |
+|---|---|---|
+| Left | GP18 | 24 |
+| Middle | GP17 | 22 |
+| Right | GP16 | 21 |
+| Ground (all switches) | GND | 38 (any GND pin works) |
+
+![Pico pinout with the pedal pins circled](images/pico-pinout-pedal-pins.png)
+
+*The pins used are circled. Note that the **GP** number (what the code uses) and the **physical pin number** (counted around the board) are different. Pinout diagram adapted from [Raspberry Pi Ltd](https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html), CC BY-SA 4.0.*
 
 **Ground:** Run one wire from a Pico **GND** pin to the switches. I daisy-chained it through two Wago connectors: the Pico's GND goes to Wago 1 in the left pedal, which feeds the left switch and continues to Wago 2 in the middle pedal, which feeds the middle and right switches. Where two thin wires share one Wago port, twist them together first. You can also solder the grounds together or use more than one of the Pico's GND pins.
 
@@ -205,5 +210,7 @@ This project uses two licenses:
 | **Firmware and app** (`firmware/`, `app/`) | [MIT](LICENSE-CODE) | Use, modify, and share freely. Keep the copyright notice |
 
 Want to sell prints? [Open an issue](../../issues) and ask.
+
+**Pico pinout diagram** (`images/pico-pinout-pedal-pins.png`): adapted from Raspberry Pi Ltd's Pico pinout, licensed CC BY-SA 4.0, not the project license.
 
 **Included third-party library:** [`adafruit_hid`](https://github.com/adafruit/Adafruit_CircuitPython_HID) by Adafruit Industries, MIT License (see `firmware/lib/adafruit_hid/LICENSE`).

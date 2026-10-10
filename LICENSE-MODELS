@@ -6,7 +6,8 @@ Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike
 
 Applies to:
   - everything in 3d-print/
-  - everything in images/
+  - everything in images/ (except pico-pinout-pedal-pins.png, which is
+    adapted from Raspberry Pi Ltd's pinout diagram under CC BY-SA 4.0)
   - everything in docs/ and the README
 
 You are free to:
