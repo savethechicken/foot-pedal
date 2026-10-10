@@ -125,11 +125,15 @@ Default keys: **Left = F13, Middle = F14, Right = F15.** F13–F24 don't exist o
 
 Change each pedal's key or combo without touching code. Keys are saved on the Pico itself, so they stay set after unplugging and work on any computer.
 
-### Option 1: download the `.exe` (Windows)
+### Option 1: download the `.exe` (Windows, easiest)
+
+**No Python needed.** Everything the app needs is built into the `.exe`.
 
 Download **Pedal Config.exe** from [Releases](../../releases) and run it. If Windows Defender warns about an unknown app, choose **More info → Run anyway**.
 
-### Option 2: run from source (any OS with Python 3.9+)
+### Option 2: run from source (Windows, macOS, Linux)
+
+**Requires Python 3.9 or newer** ([python.org](https://www.python.org/downloads/)). Use this option on macOS or Linux, or if you'd rather run the code directly.
 
 ```
 py -m pip install pyserial
