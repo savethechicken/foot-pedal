@@ -56,8 +56,8 @@ Inspired by the [USB Foot Switch](https://makerworld.com/en/models/2042179-usb-f
 | File | Qty (three pedal) |
 |---|---|
 | `3d-print/three-pedal/TripleBaseV1.3mf` | 1 |
-| `3d-print/lids/Lid_CutOut.3mf` | 1, for the pedal holding the Pico (far left) |
-| `3d-print/lids/Lid_NoCutOut.3mf` | 2, for the middle and right pedals |
+| `3d-print/pedals/Pedal_CutOut.3mf` | 1, the far-left pedal over the Pico (cutout for the USB port) |
+| `3d-print/pedals/Pedal_NoCutOut.3mf` | 2, the middle and right pedals |
 
 The three-pedal base is large. It prints in one piece on a bed big enough to fit it (I used a Snapmaker U1). Print settings for Bambu Lab printers are in the [build notes](docs/build-notes.md#print-settings).
 
@@ -93,9 +93,9 @@ No diodes are needed. Each pedal has its own pin, so there's no keyboard-matrix 
 2. **Pico:** Mount it with M2 self-tapping screws (the holes are sized at 1.8 mm), or hold it down with dots of hot glue at the corners. Keep glue off the USB port, the BOOTSEL button, and the solder joints.
 3. **Switches and wiring:** Seat the switches, wire them as above, and glue the wire runs into their channels if you like.
 4. **Springs:** Two per pedal, on the posts beside each switch.
-5. **Lids (three pedal):** Space between pedals is tight, so install in this order:
-   1. **Middle lid first:** with the outer lids off, there's room for a driver on both screws.
-   2. **Left and right lids:** put in the **outside** screw first.
+5. **Pedals (three pedal):** Space between pedals is tight, so install in this order:
+   1. **Middle pedal first:** with the outer pedals off, there's room for a driver on both screws.
+   2. **Left and right pedals:** put in the **outside** screw first.
    3. **Inside screws:** reach into the gap with a small Allen wrench and turn a little at a time until flush on the inside.
 
 ![Side view](images/finished-side.jpg)
