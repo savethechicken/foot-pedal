@@ -1,19 +1,27 @@
-# Builds "Pedal Config.exe" on a Windows machine at GitHub.
+# Builds the release downloads on a Windows machine at GitHub:
+#   - Pedal Config.exe : the config app (no Python needed)
+#   - firmware.zip     : boot.py, code.py and lib/ - unzip and copy onto CIRCUITPY
 #
-# - Publish a release (Releases -> Draft a new release) and the .exe is
+# - Publish a release (Releases -> Draft a new release) and both files are
 #   attached to it automatically.
-# - Or run it by hand: Actions tab -> "Build Pedal Config.exe" -> Run workflow.
-#   The .exe then appears as a downloadable artifact on that run.
+# - Or run it by hand: Actions tab -> "Build release files" -> Run workflow.
+#   Leave "tag" empty to just build (files appear as artifacts on that run),
+#   or enter an existing release tag (like v1.0) to add firmware.zip to it.
 
-name: Build Pedal Config.exe
+name: Build release files
 
 on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag to add firmware.zip to (optional)"
+        required: false
+        default: ""
 
 permissions:
-  contents: write   # needed to attach the .exe to a release
+  contents: write   # needed to attach files to a release
 
 jobs:
   build:
@@ -31,14 +39,33 @@ jobs:
       - name: Build the .exe
         run: python -m PyInstaller --onefile --windowed --name "Pedal Config" app/pedal_config.py
 
-      - name: Save the .exe on this run
+      # Zip the CONTENTS of firmware/ (not the folder itself), so unzipping
+      # gives boot.py, code.py and lib/ ready to drag onto CIRCUITPY.
+      - name: Build firmware.zip
+        shell: pwsh
+        run: Compress-Archive -Path firmware\* -DestinationPath dist\firmware.zip
+
+      - name: Save the files on this run
         uses: actions/upload-artifact@v4
         with:
-          name: Pedal-Config-exe
-          path: dist/Pedal Config.exe
+          name: release-files
+          path: |
+            dist/Pedal Config.exe
+            dist/firmware.zip
 
-      - name: Attach the .exe to the release
+      - name: Attach both files to the new release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/Pedal Config.exe
+          files: |
+            dist/Pedal Config.exe
+            dist/firmware.zip
+
+      # Manual run with a tag: add only firmware.zip, so an existing,
+      # already-tested .exe on that release is left alone.
+      - name: Add firmware.zip to an existing release
+        if: github.event_name == 'workflow_dispatch' && inputs.tag != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag }}
+          files: dist/firmware.zip
