@@ -32,7 +32,7 @@ Inspired by the [USB Foot Switch](https://makerworld.com/en/models/2042179-usb-f
 | Raspberry Pi Pico 1 or 2 | 1 | 1 | |
 | Cherry MX–style mechanical key switch | 1 | 3 | |
 | Compression spring, 3/8" × 3/4" (≈9.5 × 19.1 mm) | 2 | 6 | From the [Harbor Freight 200-piece assorted spring set](https://www.harborfreight.com/200-piece-assorted-spring-set-67562.html), which includes 10 of this size. 7/32" × 11/16" and 3/8" × 5/8" from the same set also work |
-| M3 heat-set inserts | 2 | 6 | |
+| M3 heat-set inserts | 2 | 6 | Recommended. Screws alone also work (see Assembly) |
 | M3 × 4 screws | 2 | 6 | M3 × 5 or M3 × 6 also work but are harder to tighten in the tight gap |
 | M2 self-tapping screws | up to 4 | up to 4 | Optional, to mount the Pico. Hot glue works too |
 | 22 AWG wire | ✓ | ✓ | Any color |
@@ -90,6 +90,9 @@ No diodes are needed. Each pedal has its own pin, so there's no keyboard-matrix 
 ## Assembly
 
 1. **Heat-set inserts:** Install the M3 inserts. ⚠️ **Go slow.** There's no clear straight-on angle to the holes, but with patience they go in straight.
+
+   > **Optional: skip the inserts.** In testing, the M3 screws also thread straight into the insert holes and hold the pedal in place with little to no play, while still letting it pivot correctly. Long-term durability without inserts hasn't been tested yet, so the inserts are still recommended. If you skip them and a pedal loosens over time, you can add inserts later.
+
 2. **Pico:** Mount it with M2 self-tapping screws (the holes are sized at 1.8 mm), or hold it down with dots of hot glue at the corners. Keep glue off the USB port, the BOOTSEL button, and the solder joints.
 3. **Switches and wiring:** Seat the switches, wire them as above, and glue the wire runs into their channels if you like.
 4. **Springs:** Two per pedal, on the posts beside each switch.

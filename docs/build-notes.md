@@ -23,7 +23,7 @@ More details to come.
 
 | Item | One Pedal | Three Pedal | Notes |
 |---|---|---|---|
-| M3 heat-set inserts | 2 | 6 | |
+| M3 heat-set inserts | 2 | 6 | Recommended. Screws alone also work (see Assembly) |
 | M3 × 4 screws | 2 | 6 | Used on all pedals. M3 × 5 or M3 × 6 also work, but they're tighter and harder to tighten down (see Assembly) |
 | Cherry MX mechanical key switch | 1 | 3 | |
 | Compression spring | 2 | 6 | **3/8" × 3/4" (about 9.5 mm × 19.1 mm)** from the Harbor Freight 200-piece assorted set. See the Spring section for alternatives |
@@ -74,6 +74,8 @@ Pico GND ──► Wago #1 (left pedal) ──► Switch 1
 ### Heat-Set Inserts
 
 > ⚠️ **Go slow.** The inserts can be hard to get straight because there's no clear straight-on angle to the hole. With patience, they can be placed straight in the hole.
+
+**Skipping the inserts (tested Oct 10, 2026):** I screwed the M3 screws straight into the insert holes without inserts. The screws fit the cavity, hold the pedal with little to no play, and the pedal still pivots correctly. Long-term durability is unknown, so the inserts are still recommended.
 
 ### Mounting the Pico
 
