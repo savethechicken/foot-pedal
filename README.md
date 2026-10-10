@@ -98,6 +98,8 @@ No diodes are needed. Each pedal has its own pin, so there's no keyboard-matrix 
    2. **Left and right pedals:** put in the **outside** screw first.
    3. **Inside screws:** reach into the gap with a small Allen wrench and turn a little at a time until flush on the inside.
 
+   > ⚠️ **Don't over-tighten.** These screws are the pedal's hinge. Tighten them until they're snug, then check that the pedal still pivots freely and springs back up. If it binds, back the screws off slightly.
+
 ![Side view](images/finished-side.jpg)
 
 ---

@@ -90,6 +90,8 @@ There's very little room between the pedals, so I used **M3 × 4** screws on all
 2. **Left and right pedals:** On each one, put in the **outside screw** first.
 3. **Inside screws (between pedals):** Use a **small Allen wrench** to reach into the gap between the two pedals. Turn the screw as far as the gap allows on each pass, then reposition and repeat until it's flush.
 
+> ⚠️ **Don't over-tighten.** The screws should be snug, but the pedal still needs to pivot on them.
+
 ---
 
 ## Spring
