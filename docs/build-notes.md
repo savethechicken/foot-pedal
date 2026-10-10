@@ -346,9 +346,9 @@ To get the drive to show this way, hold the far-left pedal while pressing Enter 
 
 ---
 
-## Companion App: Pedal Config 🚧 In Progress (Oct 10, 2026)
+## Companion App: Pedal Config ✅ TESTED (Oct 10, 2026)
 
-A Python desktop app (tkinter + pyserial) that changes each pedal's key without editing `code.py`. The full code and setup steps are in the `pedal-config` project folder (`README.md`).
+A Python desktop app (tkinter + pyserial) that changes each pedal's key without editing `code.py`. The code is in `app/` and `firmware/` in this repo, and the `.exe` is on the Releases page.
 
 - **Connection:** USB serial. `boot.py` turns on a second serial port (`usb_cdc` data) just for the app, so it works with the CIRCUITPY drive hidden.
 - **Storage:** Keys are saved in the Pico's NVM (`microcontroller.nvm`), so they survive unplugging and work on any computer, even without the app.
@@ -356,7 +356,7 @@ A Python desktop app (tkinter + pyserial) that changes each pedal's key without 
 - **Builds:** Supports both the single and three-pedal builds. The app reads the pedal count from the Pico.
 - **Live check:** Each pedal's dot in the app turns green while pressed.
 - **Pedal order is now left to right:** defaults are Left = F13, Middle = F14, Right = F15 (the reverse of the earlier three-pedal `code.py`).
-- **Status:** Tested on a simulated Pico. Not yet tested on the real pedal.
+- **Status:** Tested on the real pedal with the `.exe` build (Oct 10, 2026).
 
 ---
 
@@ -364,7 +364,7 @@ A Python desktop app (tkinter + pyserial) that changes each pedal's key without 
 
 - [x] Test the three-pedal `code.py`
 - [x] Decide on a `boot.py` for the three pedal (GP18, far-left pedal)
-- [ ] Test the Pedal Config app on the real pedal
+- [x] Test the Pedal Config app on the real pedal
 - [ ] Single pedal design details
 - [ ] Three-pedal design details
 - [x] Confirm whether superglue is needed (optional, for the wire runs)
