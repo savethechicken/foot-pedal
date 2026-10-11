@@ -36,12 +36,10 @@ NONE_LABEL = "(none)"
 # The names are the same ones both pedal firmwares understand.
 KEY_CHOICES = (
     [(f"F{n}", f"F{n}") for n in range(13, 25)]             # F13-F24: never clash with typing
+    # These numpad keys always send the same thing, whatever Num Lock is set to
     + [("Numpad /", "KEYPAD_FORWARD_SLASH"), ("Numpad *", "KEYPAD_ASTERISK"),
        ("Numpad -", "KEYPAD_MINUS"), ("Numpad +", "KEYPAD_PLUS"),
-       ("Numpad Enter", "KEYPAD_ENTER"), ("Numpad .", "KEYPAD_PERIOD")]
-    + [(f"Numpad {d}", f"KEYPAD_{w}") for d, w in
-       [("0", "ZERO"), ("1", "ONE"), ("2", "TWO"), ("3", "THREE"), ("4", "FOUR"),
-        ("5", "FIVE"), ("6", "SIX"), ("7", "SEVEN"), ("8", "EIGHT"), ("9", "NINE")]]
+       ("Numpad Enter", "KEYPAD_ENTER")]
     + [(f"F{n}", f"F{n}") for n in range(1, 13)]
     + [(chr(c), chr(c)) for c in range(ord("A"), ord("Z") + 1)]
     + [(d, w) for d, w in
@@ -53,6 +51,12 @@ KEY_CHOICES = (
        ("Up arrow", "UP_ARROW"), ("Down arrow", "DOWN_ARROW"),
        ("Left arrow", "LEFT_ARROW"), ("Right arrow", "RIGHT_ARROW"),
        ("Print Screen", "PRINT_SCREEN"), ("Pause", "PAUSE"), ("Scroll Lock", "SCROLL_LOCK")]
+    # Numpad 0-9 and . depend on Num Lock: with it OFF, Numpad 1 acts as End,
+    # Numpad 8 as Up arrow, and so on. Kept last and labelled so they're not picked by accident.
+    + [(f"Numpad {d} (needs Num Lock)", f"KEYPAD_{w}") for d, w in
+       [("0", "ZERO"), ("1", "ONE"), ("2", "TWO"), ("3", "THREE"), ("4", "FOUR"),
+        ("5", "FIVE"), ("6", "SIX"), ("7", "SEVEN"), ("8", "EIGHT"), ("9", "NINE")]]
+    + [("Numpad . (needs Num Lock)", "KEYPAD_PERIOD")]
 )
 LABEL_TO_NAME = dict(KEY_CHOICES)
 NAME_TO_LABEL = {name: label for label, name in KEY_CHOICES}
@@ -180,7 +184,7 @@ class KeyPicker:
         choices = ([NONE_LABEL] if allow_none else []) + [label for label, _ in KEY_CHOICES]
         self.key_var = tk.StringVar(value=NONE_LABEL if allow_none else "")
         ttk.Combobox(self.frame, textvariable=self.key_var, values=choices,
-                     state="readonly", width=16).pack(anchor="w", pady=(2, 0))
+                     state="readonly", width=24).pack(anchor="w", pady=(2, 0))
 
     def set_combo(self, combo):
         modifiers, main = split_combo(combo)
@@ -261,7 +265,7 @@ class App:
         ttk.Button(row, text="Forget Pairings", command=self.forget_pairings).pack(
             side="left", padx=(12, 0))
         ttk.Label(self.bt_area, foreground="#888",
-                  text="Tip: many games ignore F13-F24. Numpad keys work well "
+                  text="Tip: many games ignore F13-F24. Numpad / * - + Enter work well "
                        "for the Bluetooth computer.").pack(anchor="w", pady=(6, 0))
 
         self.bt_area.pack(fill="x", padx=18, pady=(0, 10))   # under the pedals
