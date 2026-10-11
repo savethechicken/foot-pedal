@@ -59,7 +59,15 @@ Inspired by the [USB Foot Switch](https://makerworld.com/en/models/2042179-usb-f
 | `3d-print/pedals/Pedal_CutOut.3mf` | 1, the far-left pedal over the Pico (cutout for the USB port) |
 | `3d-print/pedals/Pedal_NoCutOut.3mf` | 2, the middle and right pedals |
 
-The three-pedal base is large. It prints in one piece on a bed big enough to fit it (I used a Snapmaker U1). Print settings for Bambu Lab printers are in the [build notes](docs/build-notes.md#print-settings).
+⚠️ **The three-pedal base needs a bed of at least 270 × 270 mm** to print in one piece (I used a Snapmaker U1). The pedals fit any printer. Print settings for Bambu Lab printers are in the [build notes](docs/build-notes.md#print-settings).
+
+### Smaller printer? Split the base
+
+Bambu Studio and Orca Slicer both have a **Cut** tool. Split the base, print the halves, then glue or plastic-weld them back together.
+
+- **Cut through the flat section between two pedal housings,** not through a housing, the pivot posts, the screw holes or the wire channel.
+- **Add alignment connectors when cutting.** The Cut tool's **Dowel** or **Plug** options help the halves line up straight, so the pedals sit level.
+- **Join with** superglue (CA), plastic cement, or a plastic weld (a soldering iron melting filament into the seam). Let it fully cure before assembly, since the base takes your foot's weight on every press.
 
 ---
 
