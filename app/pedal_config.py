@@ -2,17 +2,13 @@
 """
 Pedal Config - a desktop app for changing which keys the foot pedal sends.
 
-Works with both pedal versions:
-  - Version 1: original Pico running CircuitPython (one computer, over USB)
-  - Version 2: Pico 2 W running the Arduino firmware (USB computer + Bluetooth computer)
-
 How it works, in one picture:
-    [this app]  --- USB serial port --->  [Pico]
-       sends {"cmd": "set", "keys": ...}     saves keys in its memory
-       receives {"event": "press", ...}      lights up the pedal on screen
+    [this app]  --- USB "data" serial port --->  [Pico running code.py]
+       sends {"cmd": "set", "keys": [...]}         saves keys in its memory
+       receives {"event": "press", "pedal": 0}     lights up pedal on screen
 
-Needs: Python 3.9+ and pyserial  (py -m pip install pyserial)
-Run:   py pedal_config.py
+Needs: Python 3.9+ and pyserial  (pip install pyserial)
+Run:   python pedal_config.py
 """
 
 import json
@@ -24,41 +20,23 @@ import serial                         # pyserial: talks to serial (COM) ports
 from serial.tools import list_ports   # lists the COM ports on this computer
 
 APP_TITLE = "Pedal Config"
-PEDAL_VIDS = (0x239A, 0x2E8A)         # USB vendor IDs: CircuitPython boards, Raspberry Pi
+CIRCUITPYTHON_VID = 0x239A            # USB vendor ID used by CircuitPython boards
 
-# Modifier keys: (label shown in the app, key name sent to the Pico)
+# Modifier keys: (label shown in the app, Keycode name sent to the Pico)
 MODIFIERS = [("Ctrl", "CONTROL"), ("Shift", "SHIFT"), ("Alt", "ALT"), ("Win", "GUI")]
 MODIFIER_NAMES = {name for _, name in MODIFIERS}
 
-NONE_LABEL = "(none)"
-
-# Main keys you can pick: (label shown in the app, key name sent to the Pico).
-# The names are the same ones both pedal firmwares understand.
-KEY_CHOICES = (
-    [(f"F{n}", f"F{n}") for n in range(13, 25)]             # F13-F24: never clash with typing
-    + [("Numpad /", "KEYPAD_FORWARD_SLASH"), ("Numpad *", "KEYPAD_ASTERISK"),
-       ("Numpad -", "KEYPAD_MINUS"), ("Numpad +", "KEYPAD_PLUS"),
-       ("Numpad Enter", "KEYPAD_ENTER"), ("Numpad .", "KEYPAD_PERIOD")]
-    + [(f"Numpad {d}", f"KEYPAD_{w}") for d, w in
-       [("0", "ZERO"), ("1", "ONE"), ("2", "TWO"), ("3", "THREE"), ("4", "FOUR"),
-        ("5", "FIVE"), ("6", "SIX"), ("7", "SEVEN"), ("8", "EIGHT"), ("9", "NINE")]]
-    + [(f"F{n}", f"F{n}") for n in range(1, 13)]
-    + [(chr(c), chr(c)) for c in range(ord("A"), ord("Z") + 1)]
-    + [(d, w) for d, w in
-       [("1", "ONE"), ("2", "TWO"), ("3", "THREE"), ("4", "FOUR"), ("5", "FIVE"),
-        ("6", "SIX"), ("7", "SEVEN"), ("8", "EIGHT"), ("9", "NINE"), ("0", "ZERO")]]
-    + [("Space", "SPACEBAR"), ("Enter", "ENTER"), ("Esc", "ESCAPE"), ("Tab", "TAB"),
-       ("Backspace", "BACKSPACE"), ("Delete", "DELETE"), ("Insert", "INSERT"),
-       ("Home", "HOME"), ("End", "END"), ("Page Up", "PAGE_UP"), ("Page Down", "PAGE_DOWN"),
-       ("Up arrow", "UP_ARROW"), ("Down arrow", "DOWN_ARROW"),
-       ("Left arrow", "LEFT_ARROW"), ("Right arrow", "RIGHT_ARROW"),
-       ("Print Screen", "PRINT_SCREEN"), ("Pause", "PAUSE"), ("Scroll Lock", "SCROLL_LOCK")]
+# Main keys you can pick. These are adafruit_hid Keycode names.
+MAIN_KEYS = (
+    [f"F{n}" for n in range(13, 25)]          # F13-F24: great for pedals, no conflicts
+    + [f"F{n}" for n in range(1, 13)]
+    + [chr(c) for c in range(ord("A"), ord("Z") + 1)]
+    + ["ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "ZERO"]
+    + ["SPACEBAR", "ENTER", "ESCAPE", "TAB", "BACKSPACE", "DELETE", "INSERT",
+       "HOME", "END", "PAGE_UP", "PAGE_DOWN",
+       "UP_ARROW", "DOWN_ARROW", "LEFT_ARROW", "RIGHT_ARROW",
+       "PRINT_SCREEN", "PAUSE", "SCROLL_LOCK"]
 )
-LABEL_TO_NAME = dict(KEY_CHOICES)
-NAME_TO_LABEL = {name: label for label, name in KEY_CHOICES}
-
-# What each output is called on screen
-OUTPUT_TITLES = {"usb": "USB computer", "bt": "Bluetooth computer"}
 
 
 # ---------------------------------------------------------------------------
@@ -82,10 +60,7 @@ def build_combo(modifiers, main):
 
 def describe(combo):
     """["CONTROL", "F13"] -> "Ctrl + F13" (for messages to the user)."""
-    if not combo:
-        return "nothing"
     labels = dict((name, label) for label, name in MODIFIERS)
-    labels.update(NAME_TO_LABEL)
     return " + ".join(labels.get(name, name) for name in combo)
 
 
@@ -97,8 +72,8 @@ class PedalLink:
     """Wraps one open serial port and speaks the pedal's JSON-lines language."""
 
     def __init__(self, port_name):
-        # timeout=0: read() returns right away with whatever has arrived
-        # write_timeout: never freeze on a port that won't accept data
+        # timeout=0 means read() returns right away with whatever has arrived
+        # write_timeout stops the app from freezing on a port that never accepts data
         self.port = serial.Serial(port_name, 115200, timeout=0, write_timeout=1)
         self.port_name = port_name
         self.buffer = b""
@@ -137,10 +112,10 @@ class PedalLink:
 
 
 def find_pedal():
-    """Try each serial port and return (PedalLink, hello reply) for the pedal."""
+    """Try each serial port and return a PedalLink to the one that's a pedal."""
     ports = list(list_ports.comports())
-    # Check Pico ports first - like checking the most likely drawer first
-    ports.sort(key=lambda p: p.vid not in PEDAL_VIDS)
+    # Check CircuitPython ports first - like checking the most likely drawer first
+    ports.sort(key=lambda p: p.vid != CIRCUITPYTHON_VID)
     for info in ports:
         try:
             link = PedalLink(info.device)
@@ -151,7 +126,7 @@ def find_pedal():
             if reply.get("device") == "foot-pedal":
                 return link, reply
         except (TimeoutError, serial.SerialException, OSError):
-            pass                  # (pyserial's write timeout is a SerialException too)
+            pass              # (pyserial's write timeout is a SerialException too)
         link.close()
     return None, None
 
@@ -160,62 +135,38 @@ def find_pedal():
 # The window
 # ---------------------------------------------------------------------------
 
-class KeyPicker:
-    """Modifier checkboxes + a key list, for one pedal and one computer."""
+class PedalRow:
+    """The controls for one pedal: a light, modifier checkboxes and a key list."""
 
-    def __init__(self, parent, title, allow_none):
-        self.frame = ttk.Frame(parent)
-        self.frame.pack(fill="x", pady=(6, 0))
-        ttk.Label(self.frame, text=title, font=("Segoe UI", 9, "bold")).pack(anchor="w")
+    def __init__(self, parent, name, column):
+        self.frame = ttk.LabelFrame(parent, text=f" {name} ", padding=12)
+        self.frame.grid(row=0, column=column, padx=8, sticky="n")
 
-        mods = ttk.Frame(self.frame)
-        mods.pack(anchor="w")
+        # A little circle that turns green while the pedal is held down
+        self.light = tk.Canvas(self.frame, width=26, height=26, highlightthickness=0)
+        self.dot = self.light.create_oval(3, 3, 23, 23, fill="#555", outline="")
+        self.light.pack(pady=(0, 8))
+
         self.mod_vars = {}
-        for label, name in MODIFIERS:
+        for label, name_ in MODIFIERS:
             var = tk.BooleanVar()
-            ttk.Checkbutton(mods, text=label, variable=var).pack(side="left")
-            self.mod_vars[name] = var
+            ttk.Checkbutton(self.frame, text=label, variable=var).pack(anchor="w")
+            self.mod_vars[name_] = var
 
-        choices = ([NONE_LABEL] if allow_none else []) + [label for label, _ in KEY_CHOICES]
-        self.key_var = tk.StringVar(value=NONE_LABEL if allow_none else "")
-        ttk.Combobox(self.frame, textvariable=self.key_var, values=choices,
-                     state="readonly", width=16).pack(anchor="w", pady=(2, 0))
+        ttk.Label(self.frame, text="Key").pack(anchor="w", pady=(8, 0))
+        self.key_var = tk.StringVar()
+        ttk.Combobox(self.frame, textvariable=self.key_var, values=MAIN_KEYS,
+                     state="readonly", width=14).pack()
 
     def set_combo(self, combo):
         modifiers, main = split_combo(combo)
         for name, var in self.mod_vars.items():
             var.set(name in modifiers)
-        self.key_var.set(NAME_TO_LABEL.get(main, main) if main else NONE_LABEL)
+        self.key_var.set(main)
 
     def get_combo(self):
-        """Returns (combo, problem). problem is a message if something's wrong."""
         modifiers = {name for name, var in self.mod_vars.items() if var.get()}
-        label = self.key_var.get()
-        main = "" if label in ("", NONE_LABEL) else LABEL_TO_NAME.get(label, label)
-        if modifiers and not main:
-            return None, "has Ctrl/Shift/Alt/Win ticked but no key picked"
-        return build_combo(modifiers, main), None
-
-
-class PedalPanel:
-    """One pedal: a light that shows presses, plus a KeyPicker per computer."""
-
-    def __init__(self, parent, name, column, outputs):
-        self.name = name
-        self.frame = ttk.LabelFrame(parent, text=f" {name} ", padding=12)
-        self.frame.grid(row=0, column=column, padx=8, sticky="n")
-
-        self.light = tk.Canvas(self.frame, width=26, height=26, highlightthickness=0)
-        self.dot = self.light.create_oval(3, 3, 23, 23, fill="#555", outline="")
-        self.light.pack()
-
-        # Version 1 pedals have one computer and must always send a key.
-        # Version 2 pedals have two, and either one can be "(none)".
-        single = outputs == ["usb"]
-        self.pickers = {}
-        for out in outputs:
-            title = "Key" if single else OUTPUT_TITLES.get(out, out)
-            self.pickers[out] = KeyPicker(self.frame, title, allow_none=not single)
+        return build_combo(modifiers, self.key_var.get())
 
     def set_lit(self, on):
         self.light.itemconfigure(self.dot, fill="#2ecc71" if on else "#555")
@@ -225,10 +176,7 @@ class App:
     def __init__(self, root):
         self.root = root
         self.link = None
-        self.hello = {}
-        self.panels = []
-        self.outputs = ["usb"]
-        self.reconnect_tries = 0
+        self.rows = []
 
         root.title(APP_TITLE)
         root.resizable(False, False)
@@ -236,36 +184,15 @@ class App:
         top = ttk.Frame(root, padding=10)
         top.pack(fill="x")
         ttk.Button(top, text="Connect", command=self.connect).pack(side="left")
-        self.save_button = ttk.Button(top, text="Save to Pedal", command=self.save,
-                                      state="disabled")
+        self.save_button = ttk.Button(top, text="Save to Pedal",
+                                      command=self.save, state="disabled")
         self.save_button.pack(side="left", padx=6)
-        self.reload_button = ttk.Button(top, text="Reload", command=self.reload,
-                                        state="disabled")
+        self.reload_button = ttk.Button(top, text="Reload",
+                                        command=self.reload, state="disabled")
         self.reload_button.pack(side="left")
-        self.version_label = ttk.Label(top, text="", foreground="#888")
-        self.version_label.pack(side="right")
 
-        self.pedal_area = ttk.Frame(root, padding=(10, 0, 10, 4))
+        self.pedal_area = ttk.Frame(root, padding=(10, 0, 10, 10))
         self.pedal_area.pack()
-
-        # Bluetooth controls - only shown for version 2 pedals
-        self.bt_area = ttk.LabelFrame(root, text=" Bluetooth ", padding=10)
-        self.bt_name_var = tk.StringVar()
-        row = ttk.Frame(self.bt_area)
-        row.pack(fill="x")
-        self.bt_light = tk.Canvas(row, width=16, height=16, highlightthickness=0)
-        self.bt_dot = self.bt_light.create_oval(2, 2, 14, 14, fill="#555", outline="")
-        self.bt_light.pack(side="left")
-        self.bt_status = ttk.Label(row, text="Unknown", width=14)
-        self.bt_status.pack(side="left", padx=(4, 12))
-        ttk.Label(row, text="Name:").pack(side="left")
-        ttk.Entry(row, textvariable=self.bt_name_var, width=22).pack(side="left", padx=4)
-        ttk.Button(row, text="Rename", command=self.rename).pack(side="left")
-        ttk.Button(row, text="Forget Pairings", command=self.forget_pairings).pack(
-            side="left", padx=(12, 0))
-        ttk.Label(self.bt_area, foreground="#888",
-                  text="Tip: many games ignore F13-F24. Numpad keys work well "
-                       "for the Bluetooth computer.").pack(anchor="w", pady=(6, 0))
 
         self.status = tk.StringVar(value="Plug in the pedal, then click Connect.")
         ttk.Label(root, textvariable=self.status, relief="sunken",
@@ -273,8 +200,7 @@ class App:
 
         root.protocol("WM_DELETE_WINDOW", self.quit)
         root.after(200, self.connect)          # try once at start-up
-        root.after(50, self.poll)              # listen for pedal presses
-        root.after(3000, self.check_bluetooth) # keep the Bluetooth light current
+        root.after(50, self.poll)              # start listening for pedal events
 
     # ---- connecting -------------------------------------------------------
     def connect(self):
@@ -283,23 +209,19 @@ class App:
         self.root.update_idletasks()           # repaint before the search
         link, hello = find_pedal()
         if link is None:
-            self.status.set("No pedal found. Is it plugged in? (Close Thonny or the "
-                            "Arduino Serial Monitor if either is open.)")
-            return False
+            self.status.set("No pedal found. Is it plugged in, with the new "
+                            "boot.py and code.py?")
+            return
+        if "bt" in hello.get("outputs", []):   # the Pico 2 W dual-PC pedal
+            link.close()
+            self.status.set("This is a dual-PC (Pico 2 W) pedal. "
+                            "Use Pedal Config Dual instead.")
+            return
         self.link = link
-        self.hello = hello
-        self.outputs = hello.get("outputs", ["usb"])   # version 1 pedals don't say
-        self.build_panels(hello["pedals"])
+        self.build_rows(hello["pedals"])
         self.save_button.config(state="normal")
         self.reload_button.config(state="normal")
-        version = hello.get("version", 1)
-        self.version_label.config(text=f"Pedal firmware v{version}")
-        if "bt" in self.outputs:
-            self.bt_area.pack(fill="x", padx=18, pady=(0, 10))   # shown under the pedals
-        else:
-            self.bt_area.pack_forget()
         self.reload()
-        return True
 
     def disconnect(self):
         if self.link:
@@ -311,124 +233,33 @@ class App:
         self.save_button.config(state="disabled")
         self.reload_button.config(state="disabled")
 
-    def build_panels(self, names):
+    def build_rows(self, names):
         for child in self.pedal_area.winfo_children():
             child.destroy()
-        self.panels = [PedalPanel(self.pedal_area, name, i, self.outputs)
-                       for i, name in enumerate(names)]
+        self.rows = [PedalRow(self.pedal_area, name, i) for i, name in enumerate(names)]
 
     # ---- reading and saving keys -------------------------------------------
     def reload(self):
         reply = self.talk({"cmd": "get"})
-        if not (reply and reply.get("ok")):
-            return
-        keys = reply["keys"]
-        if isinstance(keys, list):             # version 1: one list for the one computer
-            keys = {"usb": keys}
-        for out in self.outputs:
-            for panel, combo in zip(self.panels, keys.get(out, [])):
-                panel.pickers[out].set_combo(combo)
-        if "bt" in self.outputs:
-            self.bt_name_var.set(reply.get("bt_name", ""))
-            self.show_bluetooth(reply.get("bt_connected"))
-        self.status.set(f"Connected on {self.link.port_name}. "
-                        "Press a pedal to see it light up.")
-
-    def collect_keys(self):
-        """Read every picker. Returns {output: [combo per pedal]} or None if invalid."""
-        keys = {out: [] for out in self.outputs}
-        for panel in self.panels:
-            for out in self.outputs:
-                combo, problem = panel.pickers[out].get_combo()
-                if problem:
-                    messagebox.showwarning(APP_TITLE, f"{panel.name} pedal "
-                                           f"({OUTPUT_TITLES.get(out, out)}) {problem}.")
-                    return None
-                keys[out].append(combo)
-        if self.outputs == ["usb"] and any(not c for c in keys["usb"]):
-            messagebox.showwarning(APP_TITLE, "Pick a key for every pedal.")
-            return None
-        return keys
+        if reply and reply.get("ok"):
+            for row, combo in zip(self.rows, reply["keys"]):
+                row.set_combo(combo)
+            self.status.set(f"Connected on {self.link.port_name}. "
+                            "Press a pedal to see it light up.")
 
     def save(self):
-        keys = self.collect_keys()
-        if keys is None:
+        keys = [row.get_combo() for row in self.rows]
+        if any(not split_combo(combo)[1] for combo in keys):
+            messagebox.showwarning(APP_TITLE, "Pick a key for every pedal.")
             return
-        # Version 1 pedals expect a plain list; version 2 expects {"usb": ..., "bt": ...}
-        payload = keys["usb"] if self.outputs == ["usb"] else keys
-        reply = self.talk({"cmd": "set", "keys": payload})
+        reply = self.talk({"cmd": "set", "keys": keys})
         if reply and reply.get("ok"):
-            parts = []
-            for i, panel in enumerate(self.panels):
-                sends = [describe(keys[out][i]) for out in self.outputs]
-                parts.append(f"{panel.name}: " + " | ".join(sends))
-            self.status.set("Saved.  " + "   ".join(parts))
+            summary = ",  ".join(describe(c) for c in keys)
+            self.status.set(f"Saved: {summary}")
         elif reply:
             messagebox.showerror(APP_TITLE, f"The pedal said: {reply.get('error')}")
 
-    # ---- Bluetooth (version 2 pedals) ---------------------------------------
-    def show_bluetooth(self, connected):
-        self.bt_light.itemconfigure(self.bt_dot, fill="#2ecc71" if connected else "#c0392b")
-        self.bt_status.config(text="Connected" if connected else "Not connected")
-
-    def check_bluetooth(self):
-        """Every few seconds, ask the pedal whether the Bluetooth computer is connected."""
-        if self.link and "bt" in self.outputs:
-            reply = self.talk({"cmd": "hello"}, quiet=True)
-            if reply and reply.get("ok"):
-                self.show_bluetooth(reply.get("bt_connected"))
-        self.root.after(3000, self.check_bluetooth)
-
-    def rename(self):
-        name = self.bt_name_var.get().strip()
-        if not 1 <= len(name) <= 29:
-            messagebox.showwarning(APP_TITLE, "The name must be 1-29 characters.")
-            return
-        if not messagebox.askokcancel(APP_TITLE,
-                f"Rename the pedal to \"{name}\"?\n\n"
-                "The pedal will restart. Then, on the Bluetooth computer:\n"
-                "  1. Remove the old pedal in Bluetooth settings\n"
-                f"  2. Add device -> Bluetooth -> \"{name}\""):
-            return
-        reply = self.talk({"cmd": "set_name", "name": name})
-        if reply and reply.get("ok"):
-            self.wait_for_restart(f"Renamed to \"{name}\". Re-pair it on the Bluetooth computer.")
-        elif reply:
-            messagebox.showerror(APP_TITLE, f"The pedal said: {reply.get('error')}")
-
-    def forget_pairings(self):
-        if not messagebox.askokcancel(APP_TITLE,
-                "Erase all Bluetooth pairings stored on the pedal?\n\n"
-                "Use this if the Bluetooth computer shows the pedal as connected "
-                "but no keys arrive.\n\nThe pedal will restart. Then, on the "
-                "Bluetooth computer, remove the pedal and pair it again."):
-            return
-        reply = self.talk({"cmd": "forget_bt"})
-        if reply and reply.get("ok"):
-            self.wait_for_restart("Pairings erased. Remove and re-pair the pedal "
-                                  "on the Bluetooth computer.")
-
-    def wait_for_restart(self, done_message):
-        """The pedal restarts after rename/forget: wait, then reconnect."""
-        self.disconnect()
-        self.done_message = done_message
-        self.reconnect_tries = 0
-        self.status.set("Pedal is restarting...")
-        self.root.after(3000, self.try_reconnect)
-
-    def try_reconnect(self):
-        self.reconnect_tries += 1
-        if self.connect():
-            self.status.set(self.done_message)
-        elif self.reconnect_tries < 10:
-            self.status.set("Waiting for the pedal to come back...")
-            self.root.after(1500, self.try_reconnect)
-        else:
-            self.status.set("The pedal didn't come back. Unplug it, plug it back in, "
-                            "then click Connect.")
-
-    # ---- talking safely -----------------------------------------------------
-    def talk(self, message, quiet=False):
+    def talk(self, message):
         """Send one command, handling a pedal that was unplugged."""
         if not self.link:
             return None
@@ -436,10 +267,7 @@ class App:
             return self.link.request(message)
         except (TimeoutError, serial.SerialException, OSError):
             self.disconnect()
-            if not quiet:
-                self.status.set("Lost the pedal. Plug it back in and click Connect.")
-            else:
-                self.status.set("Lost the pedal. Click Connect to try again.")
+            self.status.set("Lost the pedal. Plug it back in and click Connect.")
             return None
 
     # ---- live pedal lights --------------------------------------------------
@@ -452,8 +280,8 @@ class App:
                 self.link.events = []
                 for event in events:
                     pedal = event.get("pedal", -1)
-                    if 0 <= pedal < len(self.panels):
-                        self.panels[pedal].set_lit(event["event"] == "press")
+                    if 0 <= pedal < len(self.rows):
+                        self.rows[pedal].set_lit(event["event"] == "press")
             except (serial.SerialException, OSError):
                 self.disconnect()
                 self.status.set("Lost the pedal. Plug it back in and click Connect.")
