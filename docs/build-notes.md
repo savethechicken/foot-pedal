@@ -9,7 +9,7 @@ A USB foot pedal design in two versions: a **single pedal** and a **three-pedal*
 Inspired by an earlier print of the USB Foot Switch on MakerWorld:
 https://makerworld.com/en/models/2042179-usb-foot-switch#profileId-2203328
 
-This is **not really a remix**: a few ideas came from the original pedal, but it's a complete redesign.
+This is **not a remix**: a few ideas came from the original pedal, but it's a complete redesign.
 
 **Design origin:** I printed the original, then modeled this design from scratch at a size I preferred. No original files were imported, traced, or modified (Oct 2026).
 
